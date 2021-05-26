@@ -1,0 +1,571 @@
+---
+title: 'A gentle introduction to R'
+author: 
+  - "Neil Ketchley"
+institute: 
+  - "Professor of Political Science, UiO"
+  - "Senior Research Fellow, NUPI"
+  - "ketchley@nupi.no"
+date: "`r format(Sys.time(), '%D')`"
+output:
+  beamer_presentation: 
+    theme: "Boxes"
+    colortheme: "dolphin"
+  pdf_document: default
+  ioslides_presentation: default
+fontsize: 10pt
+header-includes:
+  - \usepackage{xcolor,soul,lipsum}
+  - \usepackage{hyperref}
+  - \hypersetup{linkcolor=blue,citecolor=blue,filecolor=black,urlcolor=MidnightBlue} 
+
+---
+
+## Most people aren't natural programmers
+
+\begin{figure}
+\includegraphics[width=1\linewidth]{img4}
+\end{figure}
+Check out Thomas Leeper: https://thomasleeper.com/
+
+
+## Topics
+
+- R and R Studio
+- The R syntax
+- Figures with ggplot2
+- R Markdown/blogdown/bookdown
+- #rstats
+- Web scrapping with rvest
+- OCR with tesseract and daiR
+- Future R sessions
+
+
+##
+
+\begin{figure}
+\includegraphics[width=1\linewidth]{img3}
+\end{figure}
+
+
+## Base R
+
+\begin{columns}[c]
+
+\column{.5\textwidth} % Left column and width
+\begin{figure}
+\includegraphics[width=1\linewidth]{fig7.png}
+\end{figure}
+
+\column{.5\textwidth} % Right column and width
+
+\begin{itemize}
+  \setlength\itemsep{1em}
+  \item R is the name of a widely-used, open source programming language (so-called "Base R") 
+  \item R was originally developed 26 years ago by Ross Ihaka and Robert Gentleman. It is now developed by the R Foundation
+\end{itemize}
+
+\end{columns}
+
+
+## This is what Base R looks like ... very 1990s
+
+\begin{figure}
+\includegraphics[width=1\linewidth]{fig9}
+\end{figure}
+
+
+## R Studio
+
+\begin{columns}[c]
+
+\column{.5\textwidth} % Left column and width
+\begin{figure}
+\includegraphics[width=1\linewidth]{fig8.png}
+\end{figure}
+
+
+\column{.5\textwidth} % Right column and width
+
+\begin{itemize}
+  \setlength\itemsep{1em}
+  \item RStudio is an IDE (“Integrated Development Environment”), i.e., an interface for working in R
+  \item RStudio is developed by RStudio Inc., a commercial company
+  \item The free version of R Studio is more than adequate for our needs
+\end{itemize}
+
+\end{columns}
+
+
+## This is what R Studio looks like ... fancy!
+
+\begin{figure}
+\includegraphics[width=1\linewidth]{fig10}
+\end{figure}
+
+
+## Exercise
+
+You can download both R and R Studio on Windows and Mac easily and for free
+
+- Install R for Mac from here: https://cran.r-project.org/bin/macosx/. Install R for Windows from here: https://cran.r-project.org/bin/windows/base/
+
+- Download RStudio for Windows or Mac from here: https://rstudio.com/
+products/rstudio/download/, choosing the Free version: this is what most
+people use and is more than enough for our needs
+
+**Check the Teams chat for the URLs**
+
+# Learning a programming language
+
+
+## The R syntax
+```{r results="hide", echo=TRUE, message=FALSE, warning=FALSE}
+x <- "Hello World, I can't wait to learn R!"
+```
+
+
+## The R syntax
+```{r echo=TRUE, message=FALSE, warning=FALSE}
+print(x)
+```
+
+
+## Code can be entered into the command line in the console one line at a time ...
+\begin{figure}
+\includegraphics[width=1\linewidth]{fig19.png}
+\end{figure}
+
+
+## ... or we can write scripts that execute multiple lines simultaneously
+\begin{figure}
+\includegraphics[width=1\linewidth]{fig20.png}
+\end{figure}
+
+
+## 
+```{r results="hide", message=FALSE, warning=FALSE}
+#install.packages("rworldmap")
+library(rworldmap)
+worldmap <- getMap()
+plot(worldmap[which(worldmap$SOVEREIGNT=="Norway"),])
+```
+
+## 
+```{r results="hide", message=FALSE, warning=FALSE}
+plot(worldmap[which(worldmap$SOVEREIGNT=="Norway"),],
+main = x)
+```
+
+
+# Beautiful graphics
+
+## ggplot2
+
+\begin{columns}[c]
+
+\column{.5\textwidth} % Left column and width
+\begin{figure}
+\includegraphics[width=1\linewidth]{fig13.png}
+\end{figure}
+
+
+\column{.5\textwidth} % Right column and width
+\begin{itemize}
+  \setlength\itemsep{1em}
+
+  \item ggplot2 is a powerful package that allows you to make highly-customizable, publication quality figures
+
+  \item Many major news organizations make their graphics using ggplot2
+  
+\end{itemize}
+
+\end{columns}
+
+
+## The Economist uses ggplot2 for dataviz
+\begin{figure}
+\includegraphics[width=1\linewidth]{fig29.png}
+\end{figure}
+Recreate a graph from *The Economist* in ggplot2: http://rstudio-pubs-static.s3.amazonaws.com/284329_c7e660636fec4a42a09eed968dc47f32.html
+
+
+## BBC R Cookbook
+\begin{figure}
+\includegraphics[width=1\linewidth]{fig15.png}
+\end{figure}
+Check out the Cookbook's GitHub page: https://bbc.github.io/rcookbook/
+
+
+##
+```{r, results="hide", echo=FALSE, message=FALSE, warning=FALSE}
+pacman::p_load('dplyr', 'tidyr', 'gapminder',
+               'ggplot2',  'ggalt',
+               'forcats', 'R.utils', 'png', 
+               'grid', 'ggpubr', 'scales',
+               'bbplot')
+```
+```{r, results="hide", echo=FALSE, message=FALSE, warning=FALSE}
+library("ggalt")
+library("tidyr")
+#Prepare data
+dumbbell_df <- gapminder %>%
+  filter(year == 1967 | year == 2007) %>%
+  select(country, year, lifeExp) %>%
+  spread(year, lifeExp) %>%
+  mutate(gap = `2007` - `1967`) %>%
+  arrange(desc(gap)) %>%
+  head(10)
+
+#Make plot
+ggplot(dumbbell_df, aes(x = `1967`, xend = `2007`, y = reorder(country, gap), group = country)) + 
+  geom_dumbbell(colour = "#dddddd",
+                size = 3,
+                colour_x = "#FAAB18",
+                colour_xend = "#1380A1") +
+  bbc_style() + 
+  labs(title="We're living longer",
+       subtitle="Biggest life expectancy rise, 1967-2007")
+```
+
+## 
+```{r, fig.show="hide", echo=TRUE, message=FALSE, warning=FALSE}
+library("ggalt")
+library("tidyr")
+#Prepare data
+dumbbell_df <- gapminder %>%
+  filter(year == 1967 | year == 2007) %>%
+  select(country, year, lifeExp) %>%
+  spread(year, lifeExp) %>%
+  mutate(gap = `2007` - `1967`) %>%
+  arrange(desc(gap)) %>%
+  head(10)
+
+#Make plot
+ggplot(dumbbell_df, aes(x = `1967`, xend = `2007`, 
+  y = reorder(country, gap), group = country)) + 
+  geom_dumbbell(colour = "#dddddd",
+                size = 3,
+                colour_x = "#FAAB18",
+                colour_xend = "#1380A1") +
+  bbc_style() + 
+  labs(title="We're living longer",
+       subtitle="Biggest life expectancy rise, 1967-2007")
+```
+
+
+# Disseminating reproducible research
+
+## R Markdown
+
+\begin{columns}[c]
+
+\column{.5\textwidth} % Left column and width
+\begin{figure}
+\includegraphics[width=1\linewidth]{fig12.png}
+\end{figure}
+
+
+\column{.5\textwidth} % Right column and width
+\begin{itemize}
+  \setlength\itemsep{1em}
+
+  \item R markdown can be used to save and execute code
+
+  \item R Markdown allows you to generate high quality documents that can be shared with an audience
+\end{itemize}
+
+\end{columns}
+
+
+## I made these slides in R Markdown!
+
+\begin{figure}
+\includegraphics[width=1\linewidth]{fig2}
+\end{figure}
+Check out the presentation options in R Markdown: https://bookdown.org/yihui/rmarkdown/presentations.html
+
+
+## I made this figure in a code chunk embedded in my slides
+```{r, echo=FALSE, message=FALSE, warning=FALSE}
+library("ggalt")
+library("tidyr")
+#Prepare data
+dumbbell_df <- gapminder %>%
+  filter(year == 1967 | year == 2007) %>%
+  select(country, year, lifeExp) %>%
+  spread(year, lifeExp) %>%
+  mutate(gap = `2007` - `1967`) %>%
+  arrange(desc(gap)) %>%
+  head(10)
+
+#Make plot
+ggplot(dumbbell_df, aes(x = `1967`, xend = `2007`, y = reorder(country, gap), group = country)) + 
+  geom_dumbbell(colour = "#dddddd",
+                size = 3,
+                colour_x = "#FAAB18",
+                colour_xend = "#1380A1") +
+  bbc_style() + 
+  labs(title="We're living longer",
+       subtitle="Biggest life expectancy rise, 1967-2007")
+```
+
+
+## This means you can update your figures on the fly
+\begin{figure}
+\includegraphics[width=1\linewidth]{fig17}
+\end{figure}
+
+
+## We wrote this paper in R Markdown!
+
+\begin{figure}
+\includegraphics[width=1\linewidth]{fig1}
+\end{figure}
+Check out the paper: https://osf.io/preprints/socarxiv/t72yj/
+
+
+## We wrote this paper in R Markdown!
+
+\begin{figure}
+\includegraphics[width=1\linewidth]{fig3}
+\end{figure}
+Check out the article options in R Markdown: https://bookdown.org/yihui/rmarkdown/journals.html
+
+
+## My colleagues make their websites in R Blogdown!
+
+\begin{figure}
+\includegraphics[width=1\linewidth]{fig4}
+\end{figure}
+Check out Blogdown: https://bookdown.org/yihui/blogdown/
+
+
+## Books about R are made in R Markdown ...
+
+\begin{figure}
+\includegraphics[width=1\linewidth]{fig5}
+\end{figure}
+
+
+## ... and are available online for free via R Bookdown 
+
+\begin{figure}
+\includegraphics[width=1\linewidth]{fig6}
+\end{figure}
+Check out the Bookdown about R Markdown: https://bookdown.org/yihui/rmarkdown/
+
+
+# #rstats
+
+##
+```{r, echo=FALSE, message=FALSE, warning=FALSE}
+dat <- read.csv("C:/Users/neilke/Dropbox/NUPI/NUPI_R/vdem_short.csv")
+dat$ln_gdppc <- log(dat$e_migdppc)
+```
+```{r, echo=TRUE, message=FALSE, warning=FALSE, results ='asis'}
+library(stargazer)
+mod <- lm(v2x_polyarchy ~ ln_gdppc, data = dat)
+stargazer(mod, header = FALSE, style = "apsr", 
+          title = "How democracy increases with GDP")
+```
+
+
+## 
+```{r, echo=TRUE, message=FALSE, warning=FALSE, results ='asis'}
+library(margins)
+cplot(mod, "ln_gdppc", what = "prediction", 
+      main = "Predicted democracy score, given GDP")
+```
+
+
+# Web scrapping with rvest
+
+
+## rvest 
+
+\begin{columns}[c]
+
+\column{.5\textwidth} % Left column and width
+\begin{figure}
+\includegraphics[width=1\linewidth]{fig25.png}
+\end{figure}
+
+
+\column{.5\textwidth} % Right column and width
+\begin{itemize}
+  \setlength\itemsep{1em}
+
+  \item rvest helps you scrape (or harvest) data from web pages
+
+  \item It does so by using the elements contained within an HTML page
+
+\end{itemize}
+
+\end{columns}
+
+
+## Diplomatic gifts to the U.S.
+\begin{figure}
+\includegraphics[width=1\linewidth]{fig21.png}
+\end{figure}
+Source: https://www.federalregister.gov/documents/2019/03/07/2019-04063/office-of-the-chief-of-protocol-gifts-to-federal-employees-from-foreign-government-sources-reported
+
+## Web pages often contain tables and other data that we want to analyze
+\begin{figure}
+\includegraphics[width=1\linewidth]{fig22.png}
+\end{figure}
+
+
+## We can select the relevant xpath using the "inspect" option
+\begin{figure}
+\includegraphics[width=1\linewidth]{fig23.png}
+\end{figure}
+
+
+## Scrape the page using rvest
+```{r, results="hide", echo=TRUE, message=FALSE, warning=FALSE, results ='asis'}
+library("rvest")
+url <- "https://www.federalregister.gov/documents/2019/03/07/2019-04063/office-of-the-chief-of-protocol-gifts-to-federal-employees-from-foreign-government-sources-reported"
+gifts_2017a <- url %>%
+  html() %>%
+  html_nodes(xpath=
+  '//*[@id="fulltext_content_area"]/div[4]/table') %>%
+  html_table()
+gifts_2017a <- gifts_2017a[[1]]
+
+```
+
+
+## We now have a diplomatic gifts dataset!
+\begin{figure}
+\includegraphics[width=1\linewidth]{fig24.png}
+\end{figure}
+
+
+# OCR
+
+## tesseract
+
+\begin{columns}[c]
+
+\column{.5\textwidth} % Left column and width
+\begin{figure}
+\includegraphics[width=1\linewidth]{fig26.png}
+\end{figure}
+
+
+\column{.5\textwidth} % Right column and width
+\begin{itemize}
+  \setlength\itemsep{1em}
+
+  \item We often want to extract text from an image
+
+  \item R has open source OCR libraries to do this, e.g. tesseract. These work best for images with high contrast, little noise and horizontal text
+  
+  \item You can also use R to interact with paid-for cloud services, e.g. Google Document AI, which are much more powerful
+  
+\end{itemize}
+
+\end{columns}
+
+
+## Colonial diplomatic telegrams
+\begin{figure}
+\includegraphics[width=1\linewidth]{img1.png}
+\end{figure}
+
+## OCR with tesseract
+```{r, echo=TRUE, message=FALSE, warning=FALSE}
+library(tesseract)
+eng <- tesseract("eng")
+text <- tesseract::ocr("C:/Users/neilke/Dropbox/NUPI/NUPI_R/img1.png"
+      , engine = eng)
+```
+\tiny Sir M. Cheetham to art Curzon.—( Received **Mareh** 19.) (No. 406, Urgent.) (Telegraphic. ) Cairo, **Mareh** 18, 1919. 7 FOLLOWING is summary of events reported during the twenty-four hours ending noon, 18th March, 1010/:— Between Cairo, Alexandria, **aud** Port Said various stations burnt signal-boxes **destrayed**, and rails and sleepers removed **wong** the main and subsidiary lines. One train arrived at Cairo ftom Port Said after journey of twenty-six hours, **preeeded** by military wain repairing the line, No **communieations** with Upper Egypt beyond Wasta, where trouble serious. Many other stations destroyed. Similar damage further south reported by telegram **yid** Port Sudan; natives constantly engaged in destroying lines in numerous districts until dispersed by fire. **F ‘**Telegraph wires and poles being **destroved** in all directions. There is no communication other than by wireless telegraph and aeroplane **hetween** Cairo and the provinces. At Cairo a **aiaet** demonstration, in which some thousands took part, headed by university intellectuals, took place yesterday without incident, except where once interfered with by party of soldiers, one native casualty resulting. **i** Demonstration this morning at **Boulae** was dispersed with several casualties. Further demonstration in Cairo was ordered to disperse by military authorities and did so. At Alexandria the Khedivial mail line employees joined the students, ‘Trouble ensued ; several casualties caused by troops; dock gates closed. Various grain, sugar, and **oi)** stores threatened, but precautions taken. Attacks were made on sugar factories at Cairo, but assailants beaten off,
+
+
+## Accessing Google Document AI using daiR
+```{r}
+#library(dair)
+#library(googleCloudStorageR)
+#my_project_id2 <- "ocr-1919-telegrams"
+#gcs_list_buckets(my_project_id2)
+#gcs_create_bucket("ocr_1919_telegrams", my_project_id, location = "EU")
+#pdfs <- dir_ls(glob = "*.pdf")
+#map(pdfs, ~ gcs_upload(.x, name = paste0("historical/", .x)))
+
+#content <- gcs_list_objects()
+#our_files <- grep("^historical/mansoura_telegram", content$name, value = TRUE)
+
+#response <- dai_process(our_files, "processed")
+
+#jsons <- grep("*.json$", contents$name, value = TRUE)
+#map(jsons, ~ gcs_get_object(.x, saveToDisk = gsub("/", "_", .x), overwrite = TRUE))
+
+#text1 <- get_text("processed_mansoura_telegram.json")
+#draw_tokens("mansoura_telegram.pdf", "processed_mansoura_telegram.json")
+```
+Check out the daiR package: https://dair.info/
+
+
+## OCR with daiR
+\begin{figure}
+\includegraphics[width=1\linewidth]{check1_tokens.png}
+\end{figure}
+
+
+## OCR results with daiR
+
+\scriptsize Sir M. Cheetham to Earl Curzon.-(Received March 19.) (No. 406. Urgent.) (Telegraphic.) Cairo, March 18, 1919. 7 FOLLOWING is summary of events reported during the twenty-four hours ending noon, 18th March, 1919- Between Cairo, Alexandria, and Port Said various stations burnt signal-boxes: destroyed, and rails and sleepers removed along the main and subsidiary lines. One train arrived at Cairo from Port Said after journey of twenty-six hours, preceded by military train repairing the line. No communications with Upper Egypt beyond Wasta, where trouble serious. Many other stations destroyed. Similar damage further south reported by telegram **viâ** Port Sudan; natives constantly engaged in destroying lines in numerous districts until dispersed by fire. Telegraph wires and poles being destroyed in all directions. There is no communication other than by wireless telegraph and aeroplane between Cairo and the provinces. At Cairo a peaceful demonstration, in which some thousands took part, headed by university intellectuals, took place yesterday without incident, except where once interfered with by party of soldiers, one native casualty resulting. Demonstration this morning at Boulac was dispersed with several casualties. Further demonstration in Cairo was ordered to disperse by military authorities and did so. At Alexandria the Khedivial mail line employees joined the students. Trouble ensued; several casualties caused by troops; dock gates closed. Various grain, sugar, and oil stores threatened, but precautions taken. Attacks were made on sugar factories at Cairo, but assailants beaten off.
+
+
+## daiR can handle over 60 languages
+\begin{figure}
+\includegraphics[width=1\linewidth]{fig28.png}
+\end{figure}
+
+
+## Upcoming NUPI research design seminars
+
+- Web scrapping - 3 June
+
+- Social network analysis - 10 June
+
+- Text analysis - 24 June
+
+- R lab sessions - after the summer
+
+
+
+## Further reading: R for Data Science
+
+\begin{figure}
+\includegraphics[width=1\linewidth]{fig11}
+\end{figure}
+Read it for free: https://r4ds.had.co.nz/
+
+
+## ECPR Summer and Winter Schools
+\begin{figure}
+\includegraphics[width=1\linewidth]{fig30}
+\end{figure}
+
+Register here: https://ecpr.eu/SummerSchool
+
+## Try out the exercises yourself
+\begin{figure}
+\includegraphics[width=.5\linewidth]{fig16.png}
+\end{figure}
+
+Download the R Markdown file and the data needed to run the code chunks from this GitHub repository: https://github.com/neilketchley/NUPI
+
+
+## Acknowledgements
+
+- The code for the life expectancy graph comes from the BBC's R Cookbook: https://bbc.github.io/rcookbook/
+
+- The cleaned and trimmed V-Dem data comes from Chris Hanretty's introduction to R: http://chrishanretty.co.uk/conveRt/#1. The full V-Dem data can be downloaded here: https://www.v-dem.net/en/data/data/
+
+
+
