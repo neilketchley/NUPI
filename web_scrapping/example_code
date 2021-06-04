@@ -1,0 +1,56 @@
+---
+title: "R Notebook"
+output: html_notebook
+---
+
+# 1. Web scraping example
+
+NB! This is a working but very simplified example
+(meant for illustration purposes)
+with lot of extra work (for our computer and the servers we download from).
+The script checks a long list of URLs
+although only 10 percent or so of them work.
+Much better to scrape more focused.
+Please do not scrape all these pages if you don't need them!
+
+## Load library
+```{r}
+library(httr)
+```
+
+## Create list of URLs to scrape
+```{r}
+page_ids <- 1:100 # 65730
+url_root <- "http://en.kremlin.ru/events/president/news/"
+urls <- paste0(url_root, page_ids)
+```
+
+The result is a list of 100 (originally 65730) URLs.
+(To avoid any accidental unnecessary scraping of tens of thousands pages.)
+
+## Tell R to get those URLs
+```{r}
+pages <- list()
+
+# For each URL in the list:
+for (url in urls) {
+    # 1. download the page
+    page <- httr::GET(url)
+    # 2. Keep web page only if the web page exists (not 404 error message etc.)
+    if (httr::status_code(page) == 200) {
+        pages <- c(pages, list(page))
+    }
+    # 3. To be a good web citizen: Make a small break between
+        # each download. Here 1 second.
+    Sys.sleep(1)  
+}
+```
+
+The result is a list with all the working web pages form the list of URLs.
+From this list one then needs to extract the data one wants,
+using for example the 'rvest' library.
+
+
+# 2. The corporaexplorer app/package
+
+See https://kgjerde.github.io/corporaexplorer/ for instructions and demo apps.
